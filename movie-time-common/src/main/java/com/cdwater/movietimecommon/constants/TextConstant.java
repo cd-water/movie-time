@@ -18,4 +18,6 @@ public class TextConstant {
     public static final Integer MOVIE_STATUS_OVER = 0;
     public static final Integer MOVIE_STATUS_SHOWING = 1;
     public static final Integer MOVIE_STATUS_SOON = 2;
+
+    public static final String DEFAULT_NICKNAME_PREFIX = "user_";
 }

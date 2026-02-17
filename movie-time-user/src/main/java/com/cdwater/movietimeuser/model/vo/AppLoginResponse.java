@@ -7,6 +7,10 @@ import lombok.Data;
 @Builder
 public class AppLoginResponse {
 
+    private String nickname;
+
+    private String avatar;
+
     private String accessToken;
 
     private String refreshToken;
