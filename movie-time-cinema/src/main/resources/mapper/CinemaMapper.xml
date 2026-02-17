@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cdwater.movietimecinema.mapper.CinemaMapper">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO cinema
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="address != null">address,</if>
+            <if test="district != null">district,</if>
+            <if test="longitude != null">longitude,</if>
+            <if test="latitude != null">latitude,</if>
+            <if test="phone != null">phone,</if>
+            <if test="minPrice != null">min_price,</if>
+            <if test="tags != null">tags,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="address != null">#{address},</if>
+            <if test="district != null">#{district},</if>
+            <if test="longitude != null">#{longitude},</if>
+            <if test="latitude != null">#{latitude},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="minPrice != null">#{minPrice},</if>
+            <if test="tags != null">#{tags},</if>
+        </trim>
+    </insert>
+
+    <update id="updateById">
+        UPDATE cinema
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="longitude != null">longitude = #{longitude},</if>
+            <if test="latitude != null">latitude = #{latitude},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="minPrice != null">min_price = #{minPrice},</if>
+            <if test="tags != null">tags = #{tags},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE
+        FROM cinema
+        WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultType="com.cdwater.movietimecinema.model.entity.Cinema">
+        SELECT id,
+               name,
+               address,
+               district,
+               longitude,
+               latitude,
+               phone,
+               min_price,
+               tags,
+               create_time,
+               update_time
+        FROM cinema
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectPage" resultType="com.cdwater.movietimecinema.model.vo.CinemaPageVO">
+        SELECT id,
+        name,
+        address,
+        district,
+        min_price,
+        create_time,
+        update_time
+        FROM cinema
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE concat('%', #{name}, '%')
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM cinema
+    </select>
+</mapper>

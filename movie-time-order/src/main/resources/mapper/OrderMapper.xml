@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cdwater.movietimeorder.mapper.OrderMapper">
+    <select id="selectPage" resultType="com.cdwater.movietimeorder.model.vo.OrderPageVO">
+        SELECT o.order_no,u.nickname AS userNickname,m.name AS movieName,
+        c.name AS cinemaName,s.hall_name,
+        o.seat_info, o.ticket_count, o.amount, o.status,o.pay_time,
+        o.cancel_time, o.create_time, o.update_time FROM `order` o
+        LEFT JOIN user u ON o.user_id = u.id
+        LEFT JOIN screening s ON o.screening_id = s.id
+        LEFT JOIN movie m ON s.movie_id = m.id
+        LEFT JOIN cinema c ON s.cinema_id = c.id
+        <where>
+            <if test="orderNo != null">
+                AND o.order_no = #{orderNo}
+            </if>
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM `order`
+    </select>
+</mapper>

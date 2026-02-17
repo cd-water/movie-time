@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cdwater.movietimemovie.mapper.ReviewMapper">
+    <update id="goDead">
+        UPDATE review
+        SET status = 1
+        WHERE id = #{id}
+    </update>
+    <update id="goAlive">
+        UPDATE review
+        SET status = 0
+        WHERE id = #{id}
+    </update>
+    <select id="selectPage" resultType="com.cdwater.movietimemovie.model.vo.ReviewPageVO">
+        SELECT r.id,
+        u.nickname AS userNickname,
+        r.content,
+        r.like_count,
+        r.reply_count,
+        r.status,
+        r.create_time,
+        r.update_time
+        FROM review r
+        LEFT JOIN user u ON r.user_id = u.id
+        <where>
+            <if test="userNickname != null and userNickname != ''">
+                AND u.nickname LIKE concat('%', #{userNickname}, '%')
+            </if>
+            <if test="movieId != null">
+                AND r.movie_id = #{movieId}
+            </if>
+            <if test="status != null">
+                AND r.status = #{status}
+            </if>
+        </where>
+        ORDER BY r.id DESC
+    </select>
+</mapper>

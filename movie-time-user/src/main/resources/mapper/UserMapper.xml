@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cdwater.movietimeuser.mapper.UserMapper">
+    <select id="selectPage" resultType="com.cdwater.movietimeuser.model.vo.UserPageVO">
+        SELECT
+        phone,
+        nickname,
+        avatar,
+        gender,
+        birthday,
+        introduce,
+        fan_count,
+        follower_count,
+        create_time,
+        update_time
+        FROM user
+        <where>
+            <if test="phone != null and phone != ''">
+                AND phone LIKE concat('%', #{phone}, '%')
+            </if>
+            <if test="nickname != null and nickname != ''">
+                AND nickname LIKE concat('%', #{nickname}, '%')
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+    <select id="count" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM user
+    </select>
+</mapper>

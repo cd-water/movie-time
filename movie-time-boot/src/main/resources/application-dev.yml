@@ -1,0 +1,28 @@
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  database: movie_time
+  username: root
+  password: cdwater
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: cdwater
+  database: 0
+
+jwt:
+  secret: thisIsCdwaterSecretForMovieTimeProject
+  admin-token-ttl: 7200000
+  access-token-ttl: 1800000
+  refresh-token-ttl: 604800000
+
+snowflake:
+  datacenter-id: 1
+  machine-id: 1
+
+minio:
+  access-key: 32E00D13UlBwcHXEPP9I
+  secret-key: VwL4J3UBDHT7QguKJqUWbXTqEzrMlvO4yHIF67BV
+  endpoint: http://127.0.0.1:9000
+  bucket-name: movie-time
