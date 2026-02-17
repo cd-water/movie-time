@@ -30,14 +30,14 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(appTokenInterceptor)
                 .addPathPatterns("/app/**")
                 .excludePathPatterns(
-                        "/auth/send-code",
-                        "/auth/phone-login",
-                        "/auth/pwd-login",
-                        "/auth/forget-pwd",
-                        "/auth/refresh-token",
-                        "/cinema/**",
-                        "/movie/**",
-                        "/screening/cinema/**"
+                        "/app/auth/send-code",
+                        "/app/auth/phone-login",
+                        "/app/auth/pwd-login",
+                        "/app/auth/forget-pwd",
+                        "/app/auth/refresh-token",
+                        "/app/cinema/**",
+                        "/app/movie/**",
+                        "/app/screening/cinema/**"
                 );
     }
 }

@@ -177,7 +177,7 @@ public class AuthServiceImpl implements AuthService {
         String phone = appForgetPwdDTO.getPhone();
         String code = appForgetPwdDTO.getCode();
         //Redis校验验证码
-        if (!redisUtil.verifyCode(code, RedisConstant.LOGIN, phone)) {
+        if (!redisUtil.verifyCode(code, RedisConstant.FORGET_PWD, phone)) {
             throw new BusinessException(ReturnEnum.CODE_ERROR);
         }
         //新密码，BCrypt加密
