@@ -45,7 +45,7 @@
 ```
 movie-time
 ├── movie-time-boot -- 应用启动模块，包含所有业务模块的聚合和REST接口
-├── movie-time-framework -- 框架核心模块，包含安全、数据库、消息队列等基础设施配置
+├── movie-time-framework -- 框架核心模块，包含安全、Redis、消息队列等基础设施配置
 ├── movie-time-common -- 通用工具模块，包含公共类、常量、枚举、异常等
 ├── movie-time-movie -- 电影模块，电影及其影评相关接口
 ├── movie-time-cinema -- 影院模块，影院及其排场相关接口
