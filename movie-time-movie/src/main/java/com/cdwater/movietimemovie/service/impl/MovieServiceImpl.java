@@ -126,6 +126,8 @@ public class MovieServiceImpl implements MovieService {
             key = RedisConstant.MOVIE_SHOWING;
         } else if (TextConstant.MOVIE_STATUS_SOON.equals(status)) {
             key = RedisConstant.MOVIE_SOON;
+        } else {
+            throw new BusinessException(RetEnum.BAD_REQUEST);
         }
         //redis查询
         List<MovieListVO> listCache = redisUtil.getListByJson(key, MovieListVO.class);
@@ -137,15 +139,7 @@ public class MovieServiceImpl implements MovieService {
         RLock lock = redissonClient.getLock(lockKey);
         try {
             //尝试获取锁
-            if (!lock.tryLock(3, TimeUnit.SECONDS)) {
-                //获取锁失败，等待重试
-                Thread.sleep(100);
-                listCache = redisUtil.getListByJson(key, MovieListVO.class);
-                if (listCache != null) {
-                    return listCache;
-                }
-                throw new BusinessException(RetEnum.SYSTEM_BUSY);
-            }
+            lock.lock();//无限循环等待，保证查询成功
             //双重检查
             listCache = redisUtil.getListByJson(key, MovieListVO.class);
             if (listCache != null) {
@@ -167,13 +161,8 @@ public class MovieServiceImpl implements MovieService {
                     .build()).toList();
             redisUtil.saveListToJson(key, listVO, RedisConstant.MOVIE_LIST_TTL, TimeUnit.MINUTES);
             return listVO;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new BusinessException(RetEnum.ERROR);
         } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
+            lock.unlock();
         }
     }
 
@@ -194,19 +183,7 @@ public class MovieServiceImpl implements MovieService {
         RLock lock = redissonClient.getLock(lockKey);
         try {
             //尝试获取锁
-            if (!lock.tryLock(3, TimeUnit.SECONDS)) {
-                //获取锁失败，等待重试
-                Thread.sleep(100);
-                detailCache = redisUtil.getObjByHash(key, MovieDetailVO.class);
-                if (detailCache != null) {
-                    //检查是否是空值缓存
-                    if (detailCache.getId() == null) {
-                        return null;
-                    }
-                    return detailCache;
-                }
-                throw new BusinessException(RetEnum.SYSTEM_BUSY);
-            }
+            lock.lock();//无限循环等待，保证查询成功
             //双重检查
             detailCache = redisUtil.getObjByHash(key, MovieDetailVO.class);
             if (detailCache != null) {
@@ -240,13 +217,8 @@ public class MovieServiceImpl implements MovieService {
                 redisUtil.saveEmptyHash(key);
                 return null;
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new BusinessException(RetEnum.ERROR);
         } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
+            lock.unlock();
         }
     }
 }

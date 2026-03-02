@@ -145,40 +145,28 @@ public class CinemaServiceImpl implements CinemaService {
             RLock lock = redissonClient.getLock(lockKey);
             try {
                 //尝试获取锁
-                if (!lock.tryLock(3, TimeUnit.SECONDS)) {
-                    //获取锁失败，等待重试
-                    Thread.sleep(100);
-                    listCache = redisUtil.getListByJson(key, CinemaListVO.class);
-                    if (listCache != null) {
-                        listVO = listCache;
-                    }
-                    throw new BusinessException(RetEnum.SYSTEM_BUSY);
-                }
+                lock.lock();
                 //双重检查
                 listCache = redisUtil.getListByJson(key, CinemaListVO.class);
                 if (listCache != null) {
                     listVO = listCache;
+                } else {
+                    //缓存未命中，mysql查询
+                    List<Cinema> listDB = cinemaMapper.selectList();
+                    if (CollectionUtils.isEmpty(listDB)) {
+                        return List.of();
+                    }
+                    //回写缓存
+                    listVO = listDB.stream().map(cinema -> CinemaListVO.builder()
+                            .id(cinema.getId())
+                            .name(cinema.getName())
+                            .address(cinema.getAddress())
+                            .tags(cinema.getTags())
+                            .build()).toList();
+                    redisUtil.saveListToJson(key, listVO, RedisConstant.CINEMA_LIST_TTL, TimeUnit.MINUTES);
                 }
-                //缓存未命中，mysql查询
-                List<Cinema> listDB = cinemaMapper.selectList();
-                if (CollectionUtils.isEmpty(listDB)) {
-                    return List.of();
-                }
-                //回写缓存
-                listVO = listDB.stream().map(cinema -> CinemaListVO.builder()
-                        .id(cinema.getId())
-                        .name(cinema.getName())
-                        .address(cinema.getAddress())
-                        .tags(cinema.getTags())
-                        .build()).toList();
-                redisUtil.saveListToJson(key, listVO, RedisConstant.CINEMA_LIST_TTL, TimeUnit.MINUTES);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new BusinessException(RetEnum.ERROR);
             } finally {
-                if (lock.isHeldByCurrentThread()) {
-                    lock.unlock();
-                }
+                lock.unlock();
             }
         }
         //设置影院距离
@@ -236,19 +224,7 @@ public class CinemaServiceImpl implements CinemaService {
         RLock lock = redissonClient.getLock(lockKey);
         try {
             //尝试获取锁
-            if (!lock.tryLock(3, TimeUnit.SECONDS)) {
-                //获取锁失败，等待重试
-                Thread.sleep(100);
-                detailCache = redisUtil.getObjByJson(key, CinemaDetailVO.class);
-                if (detailCache != null) {
-                    //检查是否是空值缓存
-                    if (detailCache.getId() == null) {
-                        return null;
-                    }
-                    return detailCache;
-                }
-                throw new BusinessException(RetEnum.SYSTEM_BUSY);
-            }
+            lock.lock();
             //双重检查
             detailCache = redisUtil.getObjByJson(key, CinemaDetailVO.class);
             if (detailCache != null) {
@@ -269,13 +245,8 @@ public class CinemaServiceImpl implements CinemaService {
                 redisUtil.saveEmpty(key);
                 return null;
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new BusinessException(RetEnum.ERROR);
         } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
+            lock.unlock();
         }
     }
 }
